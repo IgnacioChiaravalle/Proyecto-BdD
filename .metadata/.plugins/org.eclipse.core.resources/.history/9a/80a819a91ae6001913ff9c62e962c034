@@ -1,0 +1,23 @@
+package Inicio;
+
+import java.sql.SQLException;
+
+public class ConsultorBdD {
+	public ConsultorBdD() {
+		
+	}
+	
+	public boolean chequearAdministrador (String password) {
+		try {
+			return java.sql.DriverManager.getConnection("jdbc:mysql://localhost:3306/vuelos?&user=admin&password=" + password) != null;
+		} catch (SQLException ex) {
+			System.out.println("SQL Exception: " + ex.getMessage());
+			System.out.println("SQL State: " + ex.getSQLState());
+			System.out.println("SQL Error Code: " + ex.getErrorCode());
+		}
+		return false;
+	}
+	public boolean chequearEmpleado(String legajo, String password) {
+		return true;
+	}
+}

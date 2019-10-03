@@ -1,0 +1,53 @@
+package Inicio;
+
+import java.awt.EventQueue;
+import java.awt.Font;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+
+public class PantallaInicial {
+	private static final int Ymax = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
+	private static final int Xmax = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
+	private JFrame frame;
+	private int frameWidth, frameHeight;
+	private JButton botonAdmin, botonEmpleado;
+	private JPanel panel;
+	
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					PantallaInicial window = new PantallaInicial();
+					window.frame.setVisible(true);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	public PantallaInicial() {
+		frame = new JFrame();
+		//frame.setBackground(new Color(0, 0, 0));
+		frame.setResizable(false);
+		frameWidth = (int) (Xmax*0.4);
+		frameHeight = (int) (Ymax*0.7);
+		frame.setBounds((int) (Xmax * 0.425), (int) (Ymax * 0.275), frameWidth, frameHeight);
+		
+		panel = new JPanel();
+		//panel.setBackground(new Color(47, 79, 79));
+		panel.setBounds(0, 0, frameWidth, frameHeight);
+		frame.getContentPane().add(panel);
+		panel.setLayout(null);
+		
+		botonAdmin = new JButton("Ingresar como Administrador");
+		botonAdmin.setEnabled(true);
+		botonAdmin.setFont(new Font("Segoe UI Symbol", Font.BOLD, 13));
+		//botonAdmin.setBackground(new Color(240, 230, 140));
+		botonAdmin.setBounds(100, 125, 270, 50);
+		panel.add(botonAdmin);
+	}
+}

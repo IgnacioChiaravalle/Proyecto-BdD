@@ -1,0 +1,36 @@
+package Inicio;
+
+import java.awt.EventQueue;
+
+import javax.swing.JFrame;
+
+public class PantallaInicial {
+	private static final int Ymax = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
+	private static final int Xmax = java.awt.Toolkit.getDefaultToolkit().getScreenSize().width;
+	private JFrame frame;
+	private int frameWidth, frameHeight;
+	
+	public static void main(String[] args) {
+		EventQueue.invokeLater(new Runnable() {
+			public void run() {
+				try {
+					PantallaInicial window = new PantallaInicial();
+					window.frame.setVisible(true);
+				}
+				catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		});
+	}
+	
+	public PantallaInicial() {
+		frame = new JFrame();
+		//frame.setBackground(new Color(0, 0, 0));
+		frame.setResizable(false);
+		frameWidth = (int) (Xmax*0.4);
+		frameHeight = (int) (Ymax*0.7);
+		frame.setBounds((int) (Xmax * 0.45), (int) (Ymax * 0.2), frameWidth, frameHeight);
+		
+	}
+}
