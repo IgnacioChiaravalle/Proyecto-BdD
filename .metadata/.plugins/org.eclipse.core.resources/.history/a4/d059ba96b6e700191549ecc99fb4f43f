@@ -11,7 +11,7 @@ public class BackgroundSetter {
 	
 	public void configurarFrame (JFrame frame, String rutaImagen) {
 		JLabel fondo = new JLabel();
-		ImageIcon iconoOriginal = new ImageIcon(rutaImagen);//new ImageIcon(this.getClass().getResource(rutaImagen));
+		ImageIcon iconoOriginal = new ImageIcon("./");//new ImageIcon(this.getClass().getResource(rutaImagen));
 		ImageIcon iconoEscala = new ImageIcon(iconoOriginal.getImage().getScaledInstance(frame.getWidth(), frame.getHeight(), java.awt.Image.SCALE_DEFAULT));
 		fondo.setIcon(iconoEscala);
 		frame.setContentPane(fondo);

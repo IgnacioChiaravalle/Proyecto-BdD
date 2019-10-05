@@ -52,7 +52,7 @@ public class PantallaInicial {
 		frame.setBounds((int) (Xmax * 0.425), (int) (Ymax * 0.275), frameWidth, frameHeight);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		BackgroundSetter backgroundSetter = new BackgroundSetter();
-		backgroundSetter.configurarFrame(frame, "./Fondo de Inicio.jpg");
+		backgroundSetter.configurarFrame(frame, "./Imágenes/Fondo de Inicio.jpg");
 		panel = frame.getContentPane();
 		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 		panel.setLayout(null);

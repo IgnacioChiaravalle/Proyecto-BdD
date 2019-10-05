@@ -36,7 +36,7 @@ public class PantallaAdministrador {
 		frameHeight = frame.getHeight();
 		frameWidth = frame.getWidth();
 		BackgroundSetter backgroundSetter = new BackgroundSetter();
-		backgroundSetter.configurarFrame(frame, "./Fondo de Administrador.jpg");
+		backgroundSetter.configurarFrame(frame, "./Imágenes/Fondo de Administrador.jpg");
 		panel = frame.getContentPane();
 		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 		panel.setLayout(null);
