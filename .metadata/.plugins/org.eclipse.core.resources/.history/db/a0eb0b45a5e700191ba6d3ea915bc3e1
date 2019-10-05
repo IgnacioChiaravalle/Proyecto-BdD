@@ -105,7 +105,6 @@ public class PantallaInicial {
 					if (option == JOptionPane.OK_OPTION) {
 						conexion c=new conexion();
 						c.iniciarConnection();
-						valido=c.iniciarConnection()!=null;
 					   // valido = consultor.chequearEmpleado(legajo.getText(), password.getText());
 					    if (!valido)
 							JOptionPane.showMessageDialog(null, "Los datos ingresados son incorrectos.", "Datos Incorrectos", JOptionPane.ERROR_MESSAGE);
