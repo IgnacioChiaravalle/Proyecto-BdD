@@ -1,19 +1,19 @@
 package Inicio;
 
-import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.EventQueue;
 import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
-import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+
+import Administrador.PantallaAdministrador;
+import ConfiguradorDeFondo.BackgroundSetter;
 
 public class PantallaInicial {
 	private static final int Ymax = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -51,16 +51,10 @@ public class PantallaInicial {
 		frameHeight = (int) (Ymax*0.7);
 		frame.setBounds((int) (Xmax * 0.425), (int) (Ymax * 0.275), frameWidth, frameHeight);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		JLabel fondo = new JLabel();
-		ImageIcon iconoOriginal = new ImageIcon(this.getClass().getResource("/Fondo de Pantalla.jpg"));
-		ImageIcon iconoEscala = new ImageIcon(iconoOriginal.getImage().getScaledInstance(frameWidth, frameHeight, java.awt.Image.SCALE_DEFAULT));
-		fondo.setIcon(iconoEscala);
-		frame.setContentPane(fondo);
-		frame.getContentPane().setLayout(new BorderLayout());
-		frame.setVisible(true);
+		BackgroundSetter backgroundSetter = new BackgroundSetter();
+		backgroundSetter.configurarFrame(frame, "/Fondo de Inicio.jpg");
 		panel = frame.getContentPane();
-		panel.setBounds(0, 0, frameWidth, frameHeight);
+		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 		panel.setLayout(null);
 	}
 	
@@ -83,8 +77,8 @@ public class PantallaInicial {
 						break;
 				}
 				
-				//if (valido)
-				//Pasar a a vista del administrador.
+				if (valido) //Pasar a a vista del administrador.
+					new PantallaAdministrador(frame, panel, consultor);
 			}
 		});
 		
@@ -115,9 +109,9 @@ public class PantallaInicial {
 	
 	private void setearBoton(JButton boton, double y) {
 		boton.setEnabled(true);
-		boton.setFont(new Font("Segoe UI Symbol", Font.BOLD, 13));
-		//botonAdmin.setBackground(new Color(240, 230, 140));
 		boton.setBounds((int) (frameWidth * 0.3), (int) (frameHeight * y), (int) (frameWidth * 0.4), (int) (frameHeight * 0.075));
+		int fontSize = (int) (boton.getHeight() * boton.getWidth() * 0.00135);
+		boton.setFont(new Font("Segoe UI Symbol", Font.BOLD, fontSize));
 		panel.add(boton);
 	}
 }
