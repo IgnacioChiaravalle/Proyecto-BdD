@@ -53,9 +53,10 @@ public class PantallaInicial {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
 		JLabel fondo = new JLabel();
-		ImageIcon iconoOriginal = new ImageIcon(this.getClass().getResource("/Fondo de Pantalla.jpg"));
-		ImageIcon iconoEscala = new ImageIcon(iconoOriginal.getImage().getScaledInstance(frameWidth, frameHeight, java.awt.Image.SCALE_DEFAULT));
-		fondo.setIcon(iconoEscala);
+		ImageIcon iconoOriginal=null;
+		//ImageIcon iconoOriginal = new ImageIcon(this.getClass().getResource("/Fondo de Pantalla.jpg"));
+		//ImageIcon iconoEscala = new ImageIcon(iconoOriginal.getImage().getScaledInstance(frameWidth, frameHeight, java.awt.Image.SCALE_DEFAULT));
+		//fondo.setIcon(iconoEscala);
 		frame.setContentPane(fondo);
 		frame.getContentPane().setLayout(new BorderLayout());
 		frame.setVisible(true);
@@ -102,7 +103,9 @@ public class PantallaInicial {
 				while (!valido) {
 					int option = JOptionPane.showConfirmDialog(null, cuadrosDeIngreso, "Acceso del Empleado", JOptionPane.OK_CANCEL_OPTION);
 					if (option == JOptionPane.OK_OPTION) {
-					    valido = consultor.chequearEmpleado(legajo.getText(), password.getText());
+						conexion c=new conexion();
+						c.iniciarConnection();
+					   // valido = consultor.chequearEmpleado(legajo.getText(), password.getText());
 					    if (!valido)
 							JOptionPane.showMessageDialog(null, "Los datos ingresados son incorrectos.", "Datos Incorrectos", JOptionPane.ERROR_MESSAGE);
 					}
@@ -115,9 +118,10 @@ public class PantallaInicial {
 	
 	private void setearBoton(JButton boton, double y) {
 		boton.setEnabled(true);
-		boton.setFont(new Font("Segoe UI Symbol", Font.BOLD, 13));
 		//botonAdmin.setBackground(new Color(240, 230, 140));
 		boton.setBounds((int) (frameWidth * 0.3), (int) (frameHeight * y), (int) (frameWidth * 0.4), (int) (frameHeight * 0.075));
+		int fontSize = (int) (boton.getHeight() * boton.getWidth() * 0.00135);
+		boton.setFont(new Font("Segoe UI Symbol", Font.BOLD, fontSize));
 		panel.add(boton);
 	}
 }

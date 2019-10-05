@@ -4,35 +4,39 @@ import java.sql.SQLException;
 
 public class ConsultorBdD {
 	private String baseDatos = "vuelos", url;
+
 	
 	public ConsultorBdD(String servidor) {
-		
-		url = "jdbc:mysql://" + servidor + "/" + baseDatos + "?serverTimezone=America/Argentina/Buenos_Aires";
-		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			java.sql.DriverManager.getConnection(url);
-		} catch (SQLException ex) {
-			System.out.println("SQL Exception: " + ex.getMessage());
-			System.out.println("SQL State: " + ex.getSQLState());
-			System.out.println("SQL Error Code: " + ex.getErrorCode());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}
+
+		/*
+		 * url = "jdbc:mysql://" + servidor + "/" + baseDatos +
+		 * "?serverTimezone=America/Argentina/Buenos_Aires"; try {
+		 * Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+		 * java.sql.DriverManager.getConnection(url); } catch (SQLException ex) {
+		 * System.out.println("SQL Exception: " + ex.getMessage());
+		 * System.out.println("SQL State: " + ex.getSQLState());
+		 * System.out.println("SQL Error Code: " + ex.getErrorCode()); } catch
+		 * (ClassNotFoundException e) { e.printStackTrace(); } }
+		 */
 	}
-	
-	public boolean chequearAdministrador (String password) {
+
+	public boolean chequearAdministrador(String password) {
+		java.sql.Connection cnx=null;
+		String servidor = "localhost:3306";
 		try {
-			return java.sql.DriverManager.getConnection(url + "admin" + password) != null;
-		} catch (SQLException ex) {
-			System.out.println("SQL Exception: " + ex.getMessage());
-			System.out.println("SQL State: " + ex.getSQLState());
-			System.out.println("SQL Error Code: " + ex.getErrorCode());
+			cnx = java.sql.DriverManager.getConnection(
+					"jdbc:mysql://" + servidor + "/" + baseDatos + "?serverTimezone=America/Argentina/Buenos_Aires","root", "");
+		} catch (java.sql.SQLException ex) {
+			System.out.println("SQLException: " + ex.getMessage());
+			System.out.println("SQLState: " + ex.getSQLState());
+			System.out.println("VendorError: " + ex.getErrorCode());
 		}
-		return false;
+		return cnx != null;
 	}
+
 	public boolean chequearEmpleado(String legajo, String password) {
 		try {
-			return java.sql.DriverManager.getConnection(url + legajo + password) != null;
+			return java.sql.DriverManager.getConnection(url,"empleando", password) != null;
 		} catch (SQLException ex) {
 			System.out.println("SQL Exception: " + ex.getMessage());
 			System.out.println("SQL State: " + ex.getSQLState());
