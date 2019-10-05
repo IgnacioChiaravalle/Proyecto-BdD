@@ -96,7 +96,9 @@ public class PantallaInicial {
 				while (!valido) {
 					int option = JOptionPane.showConfirmDialog(null, cuadrosDeIngreso, "Acceso del Empleado", JOptionPane.OK_CANCEL_OPTION);
 					if (option == JOptionPane.OK_OPTION) {
-					    valido = consultor.chequearEmpleado(legajo.getText(), password.getText());
+						Conexion.iniciarConnection();
+						valido= Conexion.iniciarConnection() != null;
+					   // valido = consultor.chequearEmpleado(legajo.getText(), password.getText());
 					    if (!valido)
 							JOptionPane.showMessageDialog(null, "Los datos ingresados son incorrectos.", "Datos Incorrectos", JOptionPane.ERROR_MESSAGE);
 					}

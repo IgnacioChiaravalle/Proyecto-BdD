@@ -1,46 +1,57 @@
 package Inicio;
 
-//import java.sql.SQLException;
+import java.sql.SQLException;
 
 public class ConsultorBdD {
-	//private String baseDatos = "vuelos", url;
+	private String baseDatos = "vuelos";
 	
-	public ConsultorBdD(String servidor) {
-		/*
-		url = "jdbc:mysql://" + servidor + "/" + baseDatos + "?serverTimezone=America/Argentina/Buenos_Aires";
+	public ConsultorBdD(String servidor) { }
+
+	public boolean chequearAdministrador(String password) {
+		java.sql.Connection cnx = null;
+		String servidor = "localhost:3306";
 		try {
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-			java.sql.DriverManager.getConnection(url);
-		} catch (SQLException ex) {
-			System.out.println("SQL Exception: " + ex.getMessage());
-			System.out.println("SQL State: " + ex.getSQLState());
-			System.out.println("SQL Error Code: " + ex.getErrorCode());
-		} catch (ClassNotFoundException e) {
-			e.printStackTrace();
-		}*/
+			cnx = java.sql.DriverManager.getConnection(
+					"jdbc:mysql://" + servidor + "/" + baseDatos + "?serverTimezone=America/Argentina/Buenos_Aires", "admin", password);
+			System.out.println("Conectado correctamente a la Base de Datos");
+	
+        } catch (SQLException e) { imprimirError(e); }
+		catch (Exception e) {
+            System.out.println("Error Desconocido:");
+            e.printStackTrace();
+        }
+		return cnx != null;
+	}
+	/*public boolean login(String usuario, String contrasena) {
+    boolean resultado = false;
+
+    sSQL = "SELECT u.nombre FROM usuario U WHERE u.usuario='"
+            + usuario + "' AND u.contrasena='" + contrasena + "'";
+
+    // Java 7 try-with-resources
+    try (Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(sSQL)) {
+
+        resultado = rs.next();
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "SQLException:\n" + e, "Error: Logica_usuario.tableRegistros(String buscar)", JOptionPane.ERROR_MESSAGE);
+        }
+
+    return resultado;
+}*/
+	public boolean chequearEmpleado(String legajo, String password) {
+		try {
+			return java.sql.DriverManager.getConnection("hola", "empleado", password) != null;
+		} catch (SQLException e) { imprimirError(e); }
+		return false;
 	}
 	
-	public boolean chequearAdministrador (String password) {
-		/*try {
-			return java.sql.DriverManager.getConnection(url, "admin", password) != null;
-		} catch (SQLException ex) {
-			System.out.println("SQL Exception: " + ex.getMessage());
-			System.out.println("SQL State: " + ex.getSQLState());
-			System.out.println("SQL Error Code: " + ex.getErrorCode());
-		}
-		return false;*/
-		return true;
-	}
-	public boolean chequearEmpleado(String legajo, String password) {
-		/*try {
-			return java.sql.DriverManager.getConnection(url, legajo, password) != null;
-		} catch (SQLException ex) {
-			System.out.println("SQL Exception: " + ex.getMessage());
-			System.out.println("SQL State: " + ex.getSQLState());
-			System.out.println("SQL Error Code: " + ex.getErrorCode());
-		}
-		return false;*/
-		return true;
+	private void imprimirError(SQLException e) {
+		System.out.println("Error de Conexión:");
+		System.out.println("SQL Exception: " + e.getMessage());
+		System.out.println("SQL State: " + e.getSQLState());
+		System.out.println("SQL Error Code: " + e.getErrorCode());
 	}
 	
 	public String comprobarSentencia(String sentencia) {

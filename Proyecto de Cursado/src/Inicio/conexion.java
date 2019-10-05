@@ -1,0 +1,52 @@
+package Inicio;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
+import java.sql.Statement;
+
+public class Conexion {
+    Connection co;  
+    static Statement stm;
+
+    //jdbc:mysql://localhost:3306/java?zeroDateTimeBehavior=convertToNull [root on Default schema]
+
+
+
+/*
+public boolean login(String usuario, String contrasena) {
+    boolean resultado = false;
+
+    sSQL = "SELECT u.nombre FROM usuario U WHERE u.usuario='"
+            + usuario + "' AND u.contrasena='" + contrasena + "'";
+
+    // Java 7 try-with-resources
+    try (Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(sSQL)) {
+
+        resultado = rs.next();
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "SQLException:\n" + e, "Error: Logica_usuario.tableRegistros(String buscar)", JOptionPane.ERROR_MESSAGE);
+        }
+
+    return resultado;
+}*/
+    public static Connection iniciarConnection(){   
+        try {
+
+            Class.forName("com.mysql.jdbc.Driver"); 
+            Connection co= DriverManager.getConnection("jdbc:mysql://localhost:3306/vuelos?serverTimezone=America/Argentina/Buenos_Aires", "empleado", "empleado");
+            stm = co.createStatement();
+            System.out.println("Conectado correctamente a la Base de Datos");
+            return co;
+        } catch (ClassNotFoundException e) {
+            System.out.println("Clase no encontrada: "+e);
+        } catch (SQLException e) {
+            System.out.println("Error de conexion: "+e);
+        } catch (Exception e) {
+            System.out.println("Error desconocido: "+e);
+        }
+            return null;
+    }
+}
