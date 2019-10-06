@@ -1,8 +1,6 @@
 package Administrador;
 
-import java.awt.Component;
 import java.awt.Container;
-import java.awt.Font;
 import java.awt.Insets;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,26 +15,26 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
+import javax.swing.JTable;
 
-import ConfiguradorDeFondo.BackgroundSetter;
+import ConfiguradorDeFondo.Sizer;
 import Inicio.ConsultorBdD;
 
 public class PantallaAdministrador {
 	private JFrame frame;
 	private Container panel;
-	private int frameHeight, frameWidth;
 	private JTextArea textArea;
-	private JLabel ingreseSentencias, tablas;
+	private JLabel ingreseSentencias, labelTablasVuelos, labelResultado;
 	private JButton limpiarTextArea, aceptarSentencia;
 	private JList<String> listaTablas;
+	private JTable tabla;
 	private ConsultorBdD consultor;
+	private Sizer sizer;
 	
 	public PantallaAdministrador(JFrame f, Container p, ConsultorBdD c) {
 		frame = f; panel = p; consultor = c;
-		frameHeight = frame.getHeight();
-		frameWidth = frame.getWidth();
-		BackgroundSetter backgroundSetter = new BackgroundSetter();
-		backgroundSetter.configurarFrame(frame, "./Fondo de Administrador.jpg");
+		sizer = new Sizer();
+		sizer.configurarFrame(frame, "./Fondo de Administrador.jpg");
 		panel = frame.getContentPane();
 		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 		panel.setLayout(null);
@@ -46,8 +44,8 @@ public class PantallaAdministrador {
 	
 	private void setearElementosPantalla() {
 		ingreseSentencias = new JLabel("Escriba aquí las sentencias SQL que desee ejecutar:");
-		ingreseSentencias.setBounds((int) (frameWidth * 0.05), (int) (frameHeight * 0.03), frameWidth, (int) (frameHeight * 0.035));
-		fontSizer(ingreseSentencias, true, 0.0013);
+		sizer.boundsSetter(ingreseSentencias, 0.05, 0.03, 1, 0.035);
+		sizer.fontSizer(ingreseSentencias, true, 0.0013);
 		panel.add(ingreseSentencias);
 		
 		setearTextArea();
@@ -64,41 +62,47 @@ public class PantallaAdministrador {
 			public void actionPerformed(ActionEvent arg0) { aceptada(); }
 		});
 		
-		tablas = new JLabel("Tablas en la base Vuelos:");
-		tablas.setBounds((int) (frameWidth * 0.6), (int) (frameHeight * 0.3), (int) (frameWidth * 0.35), (int) (frameHeight * 0.035));
-		fontSizer(tablas, true, 0.0035);
-		panel.add(tablas);
+		labelTablasVuelos = new JLabel("Tablas en la Base Vuelos:");
+		sizer.boundsSetter(labelTablasVuelos, 0.6, 0.275, 0.35, 0.035);
+		sizer.fontSizer(labelTablasVuelos, true, 0.0035);
+		panel.add(labelTablasVuelos);
 		
 		listaTablas = new JList<String>(consultor.obtenerTablas());
 		JScrollPane scrollPaneLista = new JScrollPane(listaTablas);
-		listaTablas.setBounds((int) (frameWidth * 0.6), (int) (frameHeight * 0.35), (int) (frameWidth * 0.35), (int) (frameHeight * 0.55));
+		sizer.boundsSetter(listaTablas, 0.6, 0.325, 0.35, 0.575);
+		sizer.fontSizer(listaTablas, true, 0.00025);
 		scrollPaneLista.setBounds(listaTablas.getBounds());
-		fontSizer(listaTablas, false, 0.00025);
 		crearMouseListener();
 		panel.add(scrollPaneLista);
 		
+		labelResultado = new JLabel("Resultado de la Última Ejecución:");
+		sizer.boundsSetter(labelResultado, 0.05, 0.275, 0.5, 0.035);
+		sizer.fontSizer(labelResultado, true, 0.0025);
+		panel.add(labelResultado);
+		
+		tabla = new JTable();
+		JScrollPane scrollPaneTabla = new JScrollPane(tabla);
+		sizer.boundsSetter(tabla, 0.05, 0.325, 0.5, 0.575);
+		sizer.fontSizer(tabla, true, 0.00025);
+		scrollPaneTabla.setBounds(tabla.getBounds());
+		panel.add(scrollPaneTabla);
 	}
 	
 	private void setearTextArea() {
 		textArea = new JTextArea();
 		JScrollPane scrollPaneArea = new JScrollPane(textArea);
-		textArea.setBounds((int) (frameWidth * 0.05), (int) (frameHeight * 0.1), (int) (frameWidth * 0.9), (int) (frameHeight * 0.1));
+		sizer.boundsSetter(textArea, 0.05, 0.075, 0.9, 0.1);
+		sizer.fontSizer(textArea, true, 0.0005);
 		textArea.setMargin(new Insets(5,5,5,5));
 		scrollPaneArea.setBounds(textArea.getBounds());
-		fontSizer(textArea, false, 0.0005);
 		panel.add(scrollPaneArea);
 	}
 	
 	private void setearBoton(JButton boton, double x, double ancho, double letra) {
 		boton.setEnabled(true);
-		boton.setBounds((int) (frameWidth * x), (int) (frameHeight * 0.22), (int) (frameWidth * ancho), (int) (frameHeight * 0.055));
-		fontSizer(boton, true, letra);
+		sizer.boundsSetter(boton, x, 0.2, ancho, 0.055);
+		sizer.fontSizer(boton, true, letra);
 		panel.add(boton);
-	}
-	
-	private void fontSizer(Component c, boolean negrita, double valor) {
-		int fontSize = (int) (c.getHeight() * c.getWidth() * valor);
-		c.setFont(new Font("Segoe UI Symbol", (negrita ? Font.BOLD : Font.LAYOUT_LEFT_TO_RIGHT), fontSize));
 	}
 	
 	private void aceptada() {

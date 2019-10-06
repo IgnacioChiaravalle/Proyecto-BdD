@@ -13,7 +13,8 @@ import javax.swing.JPasswordField;
 import javax.swing.JTextField;
 
 import Administrador.PantallaAdministrador;
-import ConfiguradorDeFondo.BackgroundSetter;
+import ConfiguradorDeFondo.Sizer;
+import Empleado.PantallaEmpleado;
 
 public class PantallaInicial {
 	private static final int Ymax = java.awt.Toolkit.getDefaultToolkit().getScreenSize().height;
@@ -45,14 +46,14 @@ public class PantallaInicial {
 	}
 	
 	private void setearFondo() {
-		frame = new JFrame();
+		frame = new JFrame("Vuelos");
 		frame.setResizable(false);
-		frameWidth = (int) (Xmax*0.4);
+		frameWidth = (int) (Xmax*0.4); 
 		frameHeight = (int) (Ymax*0.7);
 		frame.setBounds((int) (Xmax * 0.425), (int) (Ymax * 0.275), frameWidth, frameHeight);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		BackgroundSetter backgroundSetter = new BackgroundSetter();
-		backgroundSetter.configurarFrame(frame, "./Fondo de Inicio.jpg");
+		Sizer sizer = new Sizer();
+		sizer.configurarFrame(frame, "./Fondo de Inicio.jpg");
 		panel = frame.getContentPane();
 		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 		panel.setLayout(null);
@@ -105,6 +106,8 @@ public class PantallaInicial {
 					else
 						break;
 				}
+				if (valido) //Pasar a a vista del empleado.
+					new PantallaEmpleado(frame, panel, consultor);
 			}
 		});
 	}

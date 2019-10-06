@@ -67,4 +67,14 @@ public class ConsultorBdD {
 		String[] arreglo = {"Zorro 1", "Zorro 8", "Zorro 12", "Zorro 1"};
 		return arreglo;
 	}
+	
+	public String[] obtenerCiudades() {
+		String[] arreglo = {"Bahía Blanca", "Ciudad 13", "Área 51", "Tatooine"};
+		return arreglo;
+	}
+	
+	public String[] obtenerFechas(String partida, String destino) {
+		String[] arreglo = {"1/1/1", "32/13/-1", "36/85/4655"};
+		return arreglo;
+	}
 }

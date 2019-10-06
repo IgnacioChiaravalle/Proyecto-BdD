@@ -1,0 +1,33 @@
+package Empleado;
+
+import java.awt.Container;
+
+import javax.swing.JFrame;
+
+import ConfiguradorDeFondo.BackgroundSetter;
+import Inicio.ConsultorBdD;
+
+public class PantallaEmpleado {
+	private JFrame frame;
+	private Container panel;
+	private int frameHeight, frameWidth;
+	private ConsultorBdD consultor;
+	
+	public PantallaEmpleado(JFrame f, Container p, ConsultorBdD c) {
+		frame = f; panel = p; consultor = c;
+		frameHeight = frame.getHeight();
+		frameWidth = frame.getWidth();
+		BackgroundSetter backgroundSetter = new BackgroundSetter();
+		backgroundSetter.configurarFrame(frame, "./Fondo de Empleado.jpg");
+		panel = frame.getContentPane();
+		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
+		panel.setLayout(null);
+		
+		setearElementosPantalla();
+	}
+	
+	private void setearElementosPantalla() {
+		
+	}
+
+}
