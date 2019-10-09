@@ -1,50 +1,119 @@
 package Inicio;
 
 import java.sql.SQLException;
+import java.util.LinkedList;
+
+import quick.dbtable.DBTable;
 
 public class ConsultorBdD {
-	private String baseDatos = "vuelos";
+	Conexion conexion;
 	
-	public ConsultorBdD(String servidor) { }
+	public ConsultorBdD() { }
 
+	@SuppressWarnings("static-access")
 	public boolean chequearAdministrador(String password) {
 		java.sql.Connection cnx = null;
-		String servidor = "localhost:3306";
+		
 		try {
-			cnx = java.sql.DriverManager.getConnection(
-					"jdbc:mysql://" + servidor + "/" + baseDatos + "?serverTimezone=America/Argentina/Buenos_Aires", "admin", password);
-			System.out.println("Conectado correctamente a la Base de Datos");
-	
-        } catch (SQLException e) { imprimirError(e); }
+			cnx = conexion.iniciarConnection("admin", password);
+		}
+		catch (SQLException e) {
+			imprimirError(e);
+		}
 		catch (Exception e) {
             System.out.println("Error Desconocido:");
             e.printStackTrace();
         }
+		
 		return cnx != null;
 	}
-	/*public boolean login(String usuario, String contrasena) {
-    boolean resultado = false;
-
-    sSQL = "SELECT u.nombre FROM usuario U WHERE u.usuario='"
-            + usuario + "' AND u.contrasena='" + contrasena + "'";
-
-    // Java 7 try-with-resources
-    try (Statement st = con.createStatement();
-         ResultSet rs = st.executeQuery(sSQL)) {
-
-        resultado = rs.next();
-
-    } catch (SQLException e) {
-        JOptionPane.showMessageDialog(null, "SQLException:\n" + e, "Error: Logica_usuario.tableRegistros(String buscar)", JOptionPane.ERROR_MESSAGE);
-        }
-
-    return resultado;
-}*/
+	
+	@SuppressWarnings("static-access")
 	public boolean chequearEmpleado(String legajo, String password) {
+		boolean exito = false;
 		try {
-			return java.sql.DriverManager.getConnection("hola", "empleado", password) != null;
-		} catch (SQLException e) { imprimirError(e); }
-		return false;
+			exito = conexion.conctarEmpleado(legajo, password);
+		}
+		catch (SQLException e) {
+			imprimirError(e);
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
+		return exito;
+	}
+	
+	public DBTable comprobarSentencia(String sentencia) throws SQLException {
+		DBTable tabla = null;
+		try {
+			tabla = Conexion.ejecutarSELECT(sentencia);
+		} catch (ClassNotFoundException e) {
+			System.out.println("Error Desconocido:");
+            e.printStackTrace();
+		}
+		return tabla;
+	}
+	
+	@SuppressWarnings("static-access")
+	public String[] obtenerTablas() {
+		String[] arreglo = {};
+		try {
+			LinkedList<String> listaTablas = conexion.getTablas();
+			arreglo = setearArreglo(listaTablas);
+		} catch (SQLException e) {
+			imprimirError(e);
+		}
+		return arreglo;
+	}
+	
+	@SuppressWarnings("static-access")
+	public String[] obtenerAtributos(String nombreTabla) {
+		String[] arreglo = {};
+		try {
+			LinkedList<String> listaAtributos = conexion.getAtributos(nombreTabla);
+			arreglo = setearArreglo(listaAtributos);
+		} catch (SQLException e) {
+			imprimirError(e);
+		}
+		return arreglo;
+	}
+	
+	@SuppressWarnings("static-access")
+	public String[] obtenerCiudades() {
+		String[] arreglo = {};
+		try {
+			LinkedList<String> listaCiudades = conexion.getCiudades();
+			arreglo = setearArreglo(listaCiudades);
+		} catch (SQLException e) {
+			imprimirError(e);
+		}
+		return arreglo;
+	}
+	
+	public String[] obtenerFechas(String partida, String destino) {
+		String[] arreglo = {"1/1/1", "32/13/-1", "36/85/4655"};
+		return arreglo;
+	}
+	
+	public DBTable obtenerVuelos(String cSalida, String cLlegada) {
+		DBTable tabla = null;
+		try {
+			tabla = Conexion.getVuelos(cSalida, cLlegada);
+		} catch (SQLException e) {
+			imprimirError(e);
+		}
+		return tabla;
+	}
+	
+	
+	private String[] setearArreglo(LinkedList<String> lista) {
+		String[] arreglo = new String[lista.size()];
+		int i = 0;
+		for (String s : lista) {
+			arreglo[i] = s;
+			i++;
+		}
+		return arreglo;
 	}
 	
 	private void imprimirError(SQLException e) {
@@ -52,29 +121,5 @@ public class ConsultorBdD {
 		System.out.println("SQL Exception: " + e.getMessage());
 		System.out.println("SQL State: " + e.getSQLState());
 		System.out.println("SQL Error Code: " + e.getErrorCode());
-	}
-	
-	public String comprobarSentencia(String sentencia) {
-		return "hola";
-	}
-	
-	public String[] obtenerTablas() {
-		String[] arreglo = {"Hola", "Me", "Llamo", "Nacho"};
-		return arreglo;
-	}
-	
-	public String[] obtenerAtributos(String nombreTabla) {
-		String[] arreglo = {"Zorro 1", "Zorro 8", "Zorro 12", "Zorro 1"};
-		return arreglo;
-	}
-	
-	public String[] obtenerCiudades() {
-		String[] arreglo = {"Bahía Blanca", "Ciudad 13", "Área 51", "Tatooine"};
-		return arreglo;
-	}
-	
-	public String[] obtenerFechas(String partida, String destino) {
-		String[] arreglo = {"1/1/1", "32/13/-1", "36/85/4655"};
-		return arreglo;
 	}
 }

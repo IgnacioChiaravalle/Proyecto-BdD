@@ -1,0 +1,143 @@
+package Empleado;
+
+import java.awt.Container;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
+
+import javax.swing.JButton;
+import javax.swing.JComboBox;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+
+import ConfiguradorDeFondo.Sizer;
+import Inicio.ConsultorBdD;
+
+public class PantallaEmpleado {
+	private JFrame frame;
+	private Container panel;
+	private JLabel seleccionePartida, seleccioneDestino, seleccioneVuelosBuscados, seleccioneFechaIda, seleccioneFechaVuelta, seleccioneOpcionIda, seleccioneOpcionVuelta;
+	private JComboBox<String> partida, destino, idaVueltaOIda, fechaIda, fechaVuelta;
+	private JButton btnAceptar;
+	private JTable opcionesIda, opcionesVuelta;
+	private ConsultorBdD consultor;
+	private Sizer sizer;
+	
+	public PantallaEmpleado(JFrame f, Container p, ConsultorBdD c) {
+		frame = f; panel = p; consultor = c;
+		sizer = new Sizer();
+		sizer.configurarFrame(frame, "./Fondo de Empleado.jpg");
+		panel = frame.getContentPane();
+		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
+		panel.setLayout(null);
+		
+		setearElementosPantalla();
+	}
+	
+	private void setearElementosPantalla() {
+		setearLabelsYCombos();
+		
+		opcionesIda = new JTable();
+		JScrollPane scrollPaneIda = new JScrollPane(opcionesIda);
+		sizer.boundsSetter(opcionesIda, 0.05, 0.425, 0.9, 0.225);
+		sizer.fontSizer(opcionesIda, false, 0.00025);
+		scrollPaneIda.setBounds(opcionesIda.getBounds());
+		panel.add(scrollPaneIda);
+		
+		opcionesVuelta = new JTable();
+		JScrollPane scrollPaneVuelta = new JScrollPane(opcionesVuelta);
+		sizer.boundsSetter(opcionesVuelta, 0.05, 0.69, 0.9, 0.225);
+		sizer.fontSizer(opcionesVuelta, false, 0.00025);
+		scrollPaneVuelta.setBounds(opcionesVuelta.getBounds());
+		panel.add(scrollPaneVuelta);
+	}
+	
+	private void setearLabelsYCombos() {
+		seleccionePartida = new JLabel("Seleccione la Ciudad de Partida:");
+		sizer.boundsSetter(seleccionePartida, 0.05, 0.03, 0.45, 0.035);
+		sizer.fontSizer(seleccionePartida, true, 0.00275);
+		panel.add(seleccionePartida);
+		
+		partida = new JComboBox<String>(consultor.obtenerCiudades());
+		sizer.boundsSetter(partida, 0.05, 0.075, 0.4, 0.04);
+		sizer.fontSizer(partida, false, 0.0027);
+		panel.add(partida);
+		
+		seleccioneDestino = new JLabel("Seleccione la Ciudad de Destino:");
+		sizer.boundsSetter(seleccioneDestino, 0.55, 0.03, 0.45, 0.035);
+		sizer.fontSizer(seleccioneDestino, true, 0.00275);
+		panel.add(seleccioneDestino);
+		
+		destino = new JComboBox<String>(consultor.obtenerCiudades());
+		sizer.boundsSetter(destino, 0.55, 0.075, 0.4, 0.04);
+		sizer.fontSizer(destino, false, 0.0027);
+		panel.add(destino);
+		
+		seleccioneVuelosBuscados = new JLabel("Seleccione el Estilo de Viaje a Buscar:");
+		sizer.boundsSetter(seleccioneVuelosBuscados, 0.05, 0.15, 0.7, 0.046);
+		sizer.fontSizer(seleccioneVuelosBuscados, true, 0.002);
+		panel.add(seleccioneVuelosBuscados);
+		
+		String[] arregloIdaVuelta = {"Ida y Vuelta", "Sólo Ida"};
+		idaVueltaOIda = new JComboBox<String>(arregloIdaVuelta);
+		sizer.boundsSetter(idaVueltaOIda, 0.75, 0.15, 0.2, 0.046);
+		sizer.fontSizer(idaVueltaOIda, false, 0.005);
+		idaVueltaOIda.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent event){
+				String item = (String) event.getItem();
+				if (item.equals("Sólo Ida")) {
+					fechaVuelta.setEnabled(false);
+					opcionesVuelta.setEnabled(false);
+				}
+				else {
+					fechaVuelta.setEnabled(true);
+					opcionesVuelta.setEnabled(true);
+				}
+			}
+		});
+		panel.add(idaVueltaOIda);
+		
+		seleccioneFechaIda = new JLabel("Seleccione la Fecha de Partida:");
+		sizer.boundsSetter(seleccioneFechaIda, 0.05, 0.22, 0.45, 0.035);
+		sizer.fontSizer(seleccioneFechaIda, true, 0.00275);
+		panel.add(seleccioneFechaIda);
+		
+		fechaIda = new JComboBox<String>(consultor.obtenerFechas((String) partida.getSelectedItem(), (String) destino.getSelectedItem()));
+		sizer.boundsSetter(fechaIda, 0.05, 0.27, 0.4, 0.04);
+		sizer.fontSizer(fechaIda, false, 0.0027);
+		panel.add(fechaIda);
+		
+		seleccioneFechaVuelta = new JLabel("Seleccione la Fecha de Retorno:");
+		sizer.boundsSetter(seleccioneFechaVuelta, 0.55, 0.22, 0.45, 0.035);
+		sizer.fontSizer(seleccioneFechaVuelta, true, 0.00275);
+		panel.add(seleccioneFechaVuelta);
+		
+		fechaVuelta = new JComboBox<String>(consultor.obtenerFechas((String) destino.getSelectedItem(), (String) partida.getSelectedItem()));
+		sizer.boundsSetter(fechaVuelta, 0.55, 0.27, 0.4, 0.04);
+		sizer.fontSizer(fechaVuelta, false, 0.0027);
+		panel.add(fechaVuelta);
+		
+		btnAceptar = new JButton("ACEPTAR");
+		btnAceptar.setEnabled(true);
+		sizer.boundsSetter(btnAceptar, 0.35, 0.33, 0.3, 0.05);
+		sizer.fontSizer(btnAceptar, true, 0.004);
+		panel.add(btnAceptar);
+		/*btnAceptar.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) { aceptada(); }
+		});*/
+		
+		seleccioneOpcionIda = new JLabel("Seleccione un Vuelo para la Partida:");
+		sizer.boundsSetter(seleccioneOpcionIda, 0.05, 0.385, 0.7, 0.035);
+		sizer.fontSizer(seleccioneOpcionIda, true, 0.002);
+		panel.add(seleccioneOpcionIda);
+		
+		seleccioneOpcionVuelta = new JLabel("Seleccione un Vuelo para el Retorno:");
+		sizer.boundsSetter(seleccioneOpcionVuelta, 0.05, 0.65, 0.7, 0.035);
+		sizer.fontSizer(seleccioneOpcionVuelta, true, 0.002);
+		panel.add(seleccioneOpcionVuelta);
+	}
+
+}

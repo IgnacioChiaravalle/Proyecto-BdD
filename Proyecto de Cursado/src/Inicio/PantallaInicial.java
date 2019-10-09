@@ -2,7 +2,6 @@ package Inicio;
 
 import java.awt.Container;
 import java.awt.EventQueue;
-import java.awt.Font;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
@@ -24,6 +23,7 @@ public class PantallaInicial {
 	private JButton botonAdmin, botonEmpleado;
 	private Container panel;
 	private ConsultorBdD consultor;
+	private Sizer sizer;
 	
 	public static void main(String[] args) {
 		EventQueue.invokeLater(new Runnable() {
@@ -40,7 +40,7 @@ public class PantallaInicial {
 	}
 	
 	public PantallaInicial() {
-		consultor = new ConsultorBdD("localhost:3306");
+		consultor = new ConsultorBdD();
 		setearFondo();
 		crearBotones();
 	}
@@ -52,7 +52,7 @@ public class PantallaInicial {
 		frameHeight = (int) (Ymax*0.7);
 		frame.setBounds((int) (Xmax * 0.425), (int) (Ymax * 0.275), frameWidth, frameHeight);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		Sizer sizer = new Sizer();
+		sizer = new Sizer();
 		sizer.configurarFrame(frame, "./Fondo de Inicio.jpg");
 		panel = frame.getContentPane();
 		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
@@ -97,9 +97,7 @@ public class PantallaInicial {
 				while (!valido) {
 					int option = JOptionPane.showConfirmDialog(null, cuadrosDeIngreso, "Acceso del Empleado", JOptionPane.OK_CANCEL_OPTION);
 					if (option == JOptionPane.OK_OPTION) {
-						Conexion.iniciarConnection();
-						valido = Conexion.iniciarConnection() != null;
-					   // valido = consultor.chequearEmpleado(legajo.getText(), password.getText());
+						valido = consultor.chequearEmpleado(legajo.getText(), password.getText());
 					    if (!valido)
 							JOptionPane.showMessageDialog(null, "Los datos ingresados son incorrectos.", "Datos Incorrectos", JOptionPane.ERROR_MESSAGE);
 					}
@@ -114,9 +112,8 @@ public class PantallaInicial {
 	
 	private void setearBoton(JButton boton, double y) {
 		boton.setEnabled(true);
-		boton.setBounds((int) (frameWidth * 0.3), (int) (frameHeight * y), (int) (frameWidth * 0.4), (int) (frameHeight * 0.075));
-		int fontSize = (int) (boton.getHeight() * boton.getWidth() * 0.00135);
-		boton.setFont(new Font("Segoe UI Symbol", Font.BOLD, fontSize));
+		sizer.boundsSetter(boton, 0.3, y, 0.4, 0.075);
+		sizer.fontSizer(boton, true, 0.00135);
 		panel.add(boton);
 	}
 }

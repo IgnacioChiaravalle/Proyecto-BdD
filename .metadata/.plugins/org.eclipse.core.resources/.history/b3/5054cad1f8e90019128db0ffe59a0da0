@@ -1,0 +1,134 @@
+package Inicio;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.LinkedList;
+
+public class Conexion {
+	static Connection co;
+	static Statement statement;
+	
+	public static Connection iniciarConnection(String usuario, String password) throws SQLException, Exception {
+		Class.forName("com.mysql.jdbc.Driver");
+		co = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/vuelos?serverTimezone=America/Argentina/Buenos_Aires", usuario,
+				password);
+		statement = co.createStatement();
+		System.out.println("Conectado correctamente a la Base de Datos");
+		return co;
+	}
+	
+//Retorna una lista de los nombres de las tablas de la base de datos
+	public static LinkedList<String> mostrarTablas() throws SQLException {
+		LinkedList<String> tablas = new LinkedList<String>();
+		int i = 0;
+		ResultSet r = statement.executeQuery("SHOW TABLES;");
+		while (r.next())
+			tablas.add(i, r.getString(1));
+		r.close();
+		return tablas;
+	}
+
+//recibe el nombre de una tabla y retorna todos los artubutos de la misma 
+	public static LinkedList<String> getAtributos(String tabla) {
+		LinkedList<String> atributos = new LinkedList<String>();
+		int i = 0;
+		try {
+			ResultSet r = statement.executeQuery("DESCRIBE " + tabla + ";");
+			while (r.next()) {
+				atributos.add(i, r.getString(1));
+				// System.out.println(atributos);
+			}
+
+			r.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} // Cerrar el conjunto de resultados 4
+		return atributos;
+	}
+
+//recibe una sentencia sql que es ejecutada en la base de datos //FALTA
+	public Object ingresarSentencia(String sql) {
+		String respuesta = "";
+		try {
+			// Se crea una sentencia jdbc para realizar la consulta
+
+			// Se ejecuta la sentencia y se recibe un resultado
+			java.sql.ResultSet rs = statement.executeQuery(sql);
+			// Se recorre el resultado
+			while (rs.next()) {
+				respuesta += rs.getString("nombre_barco");
+			}
+			rs.close();
+			statement.close();
+		} catch (java.sql.SQLException ex) {
+		}
+		return respuesta;
+	}
+
+//retorna todas las ciudades de la base de datos 
+	public static LinkedList<String> getCiudades() {
+		LinkedList<String> ciudades = new LinkedList<String>();
+		int i = 0;
+		try {
+			ResultSet r = statement.executeQuery("SELECT\r\n" + "	u.ciudad\r\n" + " FROM (ubicaciones as u);");
+			while (r.next()) {
+				ciudades.add(i, r.getString(1));
+			}
+
+			r.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+		return ciudades;
+	}
+
+//retorna una tabla con los vuelos de ida
+	public LinkedList<String> vuelosIda(String cSalida, String cLlegada) {
+		LinkedList<String> vuelosI = new LinkedList<String>();
+		int i = 0;
+		try {
+			ResultSet r = statement.executeQuery("");
+			while (r.next()) {
+				vuelosI.add(i, r.getString(1));
+				// System.out.println(atributos);
+			}
+
+			r.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+		return vuelosI;
+	}
+
+	
+
+	public static boolean conctarEmpleado(String legajo, String password) {
+		try {
+			iniciarConnection("empleado", "empleado");
+		} catch (Exception e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		System.out.println(legajo);
+		try {
+			ResultSet r = statement.executeQuery("SELECT\r\n" + "	e.legajo,\r\n" + "	e.password\r\n"
+					+ " FROM (empleados as e)\r\n" + " 	WHERE (e.legajo =" + legajo + ");");
+			if (!r.next() && !r.getString(2).equals(password)) {
+				r.close();
+				statement.close();
+				co.close();
+				co = null;
+				statement = null;
+				return false;
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
+
+		return true;
+	}
+}

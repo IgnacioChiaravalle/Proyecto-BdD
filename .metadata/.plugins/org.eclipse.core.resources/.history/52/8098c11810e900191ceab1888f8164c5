@@ -1,0 +1,80 @@
+package Inicio;
+
+import java.sql.SQLException;
+
+public class ConsultorBdD {
+	private String baseDatos = "vuelos";
+	
+	public ConsultorBdD(String servidor) { }
+
+	public boolean chequearAdministrador(String password) {
+		java.sql.Connection cnx = null;
+		String servidor = "localhost:3306";
+		try {
+			cnx = java.sql.DriverManager.getConnection(
+					"jdbc:mysql://" + servidor + "/" + baseDatos + "?serverTimezone=America/Argentina/Buenos_Aires", "admin", password);
+			System.out.println("Conectado correctamente a la Base de Datos");
+	
+        } catch (SQLException e) { imprimirError(e); }
+		catch (Exception e) {
+            System.out.println("Error Desconocido:");
+            e.printStackTrace();
+        }
+		return cnx != null;
+	}
+	/*public boolean login(String usuario, String contrasena) {
+    boolean resultado = false;
+
+    sSQL = "SELECT u.nombre FROM usuario U WHERE u.usuario='"
+            + usuario + "' AND u.contrasena='" + contrasena + "'";
+
+    // Java 7 try-with-resources
+    try (Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(sSQL)) {
+
+        resultado = rs.next();
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "SQLException:\n" + e, "Error: Logica_usuario.tableRegistros(String buscar)", JOptionPane.ERROR_MESSAGE);
+        }
+
+    return resultado;
+}*/
+	public boolean chequearEmpleado(String legajo, String password) {
+		try {
+			return java.sql.DriverManager.getConnection("hola", "empleado", password) != null;
+		} catch (SQLException e) { imprimirError(e); }
+		return false;
+	}
+	
+	private void imprimirError(SQLException e) {
+		System.out.println("Error de Conexión:");
+		System.out.println("SQL Exception: " + e.getMessage());
+		System.out.println("SQL State: " + e.getSQLState());
+		System.out.println("SQL Error Code: " + e.getErrorCode());
+	}
+	
+	public String comprobarSentencia(String sentencia) {
+		return "hola";
+	}
+	
+	public String[] obtenerTablas() {
+		String[] arreglo = {"Hola", "Me", "Llamo", "Nacho"};
+		return arreglo;
+	}
+	
+	public String[] obtenerAtributos(String nombreTabla) {
+		String[] arreglo = {"Zorro 1", "Zorro 8", "Zorro 12", "Zorro 1"};
+		return arreglo;
+	}
+	
+	public String[] obtenerCiudades() {
+		String[] arreglo = {"Bahía Blanca", "Ciudad 13", "Área 51", "Tatooine"};
+		return arreglo;
+	}
+	
+	public String[] obtenerFechas(String partida, String destino) {
+		String[] arreglo = {"1/1/1", "32/13/-1", "36/85/4655"};
+		return arreglo;
+	}
+}

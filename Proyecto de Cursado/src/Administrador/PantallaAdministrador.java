@@ -7,6 +7,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.SQLException;
 
 import javax.swing.JButton;
 import javax.swing.JFrame;
@@ -15,10 +16,10 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
-import javax.swing.JTable;
 
 import ConfiguradorDeFondo.Sizer;
 import Inicio.ConsultorBdD;
+import quick.dbtable.DBTable;
 
 public class PantallaAdministrador {
 	private JFrame frame;
@@ -27,7 +28,8 @@ public class PantallaAdministrador {
 	private JLabel ingreseSentencias, labelTablasVuelos, labelResultado;
 	private JButton limpiarTextArea, aceptarSentencia;
 	private JList<String> listaTablas;
-	private JTable tabla;
+	private DBTable tabla;
+	private JScrollPane scrollPaneTabla;
 	private ConsultorBdD consultor;
 	private Sizer sizer;
 	
@@ -67,53 +69,75 @@ public class PantallaAdministrador {
 		sizer.fontSizer(labelTablasVuelos, true, 0.0035);
 		panel.add(labelTablasVuelos);
 		
-		listaTablas = new JList<String>(consultor.obtenerTablas());
-		JScrollPane scrollPaneLista = new JScrollPane(listaTablas);
-		sizer.boundsSetter(listaTablas, 0.6, 0.325, 0.35, 0.575);
-		sizer.fontSizer(listaTablas, true, 0.00025);
-		scrollPaneLista.setBounds(listaTablas.getBounds());
-		crearMouseListener();
-		panel.add(scrollPaneLista);
+		setearLista();
 		
 		labelResultado = new JLabel("Resultado de la Última Ejecución:");
 		sizer.boundsSetter(labelResultado, 0.05, 0.275, 0.5, 0.035);
 		sizer.fontSizer(labelResultado, true, 0.0025);
 		panel.add(labelResultado);
 		
-		tabla = new JTable();
-		JScrollPane scrollPaneTabla = new JScrollPane(tabla);
-		sizer.boundsSetter(tabla, 0.05, 0.325, 0.5, 0.575);
-		sizer.fontSizer(tabla, true, 0.00025);
-		scrollPaneTabla.setBounds(tabla.getBounds());
-		panel.add(scrollPaneTabla);
+		setearTabla(null);
 	}
 	
 	private void setearTextArea() {
 		textArea = new JTextArea();
 		JScrollPane scrollPaneArea = new JScrollPane(textArea);
 		sizer.boundsSetter(textArea, 0.05, 0.075, 0.9, 0.1);
-		sizer.fontSizer(textArea, true, 0.0005);
+		sizer.fontSizer(textArea, false, 0.0005);
 		textArea.setMargin(new Insets(5,5,5,5));
 		scrollPaneArea.setBounds(textArea.getBounds());
 		panel.add(scrollPaneArea);
 	}
 	
+	private void setearLista() {
+		if (listaTablas != null)
+			panel.remove(listaTablas);
+		listaTablas = new JList<String>(consultor.obtenerTablas());
+		JScrollPane scrollPaneLista = new JScrollPane(listaTablas);
+		sizer.boundsSetter(listaTablas, 0.6, 0.325, 0.35, 0.575);
+		sizer.fontSizer(listaTablas, false, 0.00025);
+		scrollPaneLista.setBounds(listaTablas.getBounds());
+		crearMouseListener();
+		panel.add(scrollPaneLista);
+	}
+	
+	
+	private void setearTabla(DBTable modelo) {
+		if (scrollPaneTabla != null)
+			panel.remove(scrollPaneTabla);
+		tabla = modelo;
+		scrollPaneTabla = new JScrollPane(tabla);
+		if (tabla != null) {
+			sizer.boundsSetter(tabla, 0.05, 0.325, 0.5, 0.575);
+			sizer.fontSizer(tabla, false, 0.0001);
+			scrollPaneTabla.setBounds(tabla.getBounds());
+			for (int i = 0; i < tabla.getColumnCount(); i++)
+				tabla.getColumn(i).setMinWidth((int) (tabla.getWidth() * 0.35));
+			tabla.setEditable(false);
+		}
+		panel.add(scrollPaneTabla);
+	}
+	
 	private void setearBoton(JButton boton, double x, double ancho, double letra) {
 		boton.setEnabled(true);
 		sizer.boundsSetter(boton, x, 0.2, ancho, 0.055);
-		sizer.fontSizer(boton, true, letra);
+		sizer.fontSizer(boton, false, letra);
 		panel.add(boton);
 	}
 	
 	private void aceptada() {
-		String resultadoConsulta = consultor.comprobarSentencia(textArea.getText());
-		if (resultadoConsulta.equals("")) {
-			
+		DBTable resultadoConsulta;
+		try {
+			resultadoConsulta = consultor.comprobarSentencia(textArea.getText());
+			setearTabla(resultadoConsulta); 
+			setearLista();
+		} catch (SQLException e) {
+			textArea.setText(textArea.getText() +
+							"\n\nError en la sentencia:" +
+							"\nSQL Exception: " + e.getMessage() +
+							"\nSQL State: " + e.getSQLState() +
+							"\nSQL Error Code: " + e.getErrorCode());
 		}
-		else
-			textArea.setText(textArea.getText() + "\n\nError en la sentencia:\n" + resultadoConsulta); //El error obtenido mediante el consultor.
-			//No sé cómo se hacen las consultas ni qué devuelven. Si devuelven un String, entonces puedo usar directamente ese String
-			//(decidiendo con algún criterio si es un error o no.)
 	}
 	
 	private void crearMouseListener() {
@@ -122,8 +146,8 @@ public class PantallaAdministrador {
 				if (e.getClickCount() >= 2) {
 					String selectedItem = listaTablas.getSelectedValue();
 					JList<String> lista = new JList<String>(consultor.obtenerAtributos(selectedItem));
-					JScrollPane scrollPaneOptionPane = new JScrollPane(lista);
-					JOptionPane.showMessageDialog(null, scrollPaneOptionPane, "Atributos de la tabla " + selectedItem, JOptionPane.PLAIN_MESSAGE);
+					JScrollPane scrollPane = new JScrollPane(lista);
+					JOptionPane.showMessageDialog(null, scrollPane, "Atributos de la Tabla " + selectedItem, JOptionPane.PLAIN_MESSAGE);
 				}
 			}
 		};

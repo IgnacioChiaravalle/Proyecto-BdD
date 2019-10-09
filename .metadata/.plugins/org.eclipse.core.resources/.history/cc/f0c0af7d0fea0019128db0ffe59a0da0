@@ -1,0 +1,106 @@
+package Inicio;
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.sql.Statement;
+import java.util.LinkedList;
+
+import quick.dbtable.DBTable;
+
+public class Conexion {
+	static Connection co;
+	static Statement statement;
+	
+	public static Connection iniciarConnection(String usuario, String password) throws SQLException, Exception {
+		Class.forName("com.mysql.jdbc.Driver");
+		co = DriverManager.getConnection(
+				"jdbc:mysql://localhost:3306/vuelos?serverTimezone=America/Argentina/Buenos_Aires", usuario,
+				password);
+		statement = co.createStatement();
+		System.out.println("Conectado correctamente a la Base de Datos");
+		return co;
+	}
+	
+	public static boolean conctarEmpleado(String legajo, String password) throws SQLException, Exception {
+		iniciarConnection("empleado", "empleado");
+		ResultSet r = statement.executeQuery("SELECT\r\n" + "	e.legajo,\r\n" + "	e.password\r\n"
+				+ " FROM (empleados as e)\r\n" + " 	WHERE (e.legajo =" + legajo + ");");
+		if (!r.next() || !r.getString(2).equals(password)) {
+			r.close();
+			statement.close();
+			co.close();
+			co = null;
+			statement = null;
+			return false;
+		}
+		return true;
+	}
+	
+	//Retorna una lista de los nombres de las tablas de la base de datos.
+	public static LinkedList<String> getTablas() throws SQLException {
+		LinkedList<String> tablas = new LinkedList<String>();
+		ResultSet r = statement.executeQuery("SHOW TABLES;");
+		while (r.next())
+			tablas.add(0, r.getString(1));
+		r.close();
+		return tablas;
+	}
+
+	//Recibe el nombre de una tabla y retorna todos los artibutos de la misma 
+	public static LinkedList<String> getAtributos(String tabla) throws SQLException {
+		LinkedList<String> atributos = new LinkedList<String>();
+		ResultSet r = statement.executeQuery("DESCRIBE " + tabla + ";");
+		int i = 0;
+		while (r.next())
+			atributos.add(i++, r.getString(1));
+		r.close();
+		return atributos;
+	}
+
+	//Retorna todas las ciudades de la base de datos 
+	public static LinkedList<String> getCiudades() throws SQLException {
+		LinkedList<String> ciudades = new LinkedList<String>();
+		ResultSet r = statement.executeQuery("SELECT\r\n" + "	u.ciudad\r\n" + " FROM (ubicaciones as u);");
+		int i = 0;
+		while (r.next())
+			ciudades.add(i++, r.getString(1));
+		r.close();
+		return ciudades;
+	}
+	
+	//Ejecuta una consulta (una sentencia SELECT) en SQL.
+	public static DBTable ejecutarSELECT(String sql) throws SQLException, ClassNotFoundException {
+		DBTable tabla = new DBTable();
+		tabla.setSelectSql(sql);
+		tabla.connectDatabase("com.mysql.cj.jdbc.Driver", "jdbc:mysql://localhost:3306/vuelos?serverTimezone=America/Argentina/Buenos_Aires", "admin", "admin");
+		tabla.createColumnModelFromQuery();
+		tabla.refresh();
+		return tabla;
+	}
+
+
+
+//retorna una tabla con los vuelos de ida
+	public LinkedList<String> vuelosIda(String cSalida, String cLlegada) {
+		LinkedList<String> vuelosI = new LinkedList<String>();
+		int i = 0;
+		try {
+			ResultSet r = statement.executeQuery("");
+			while (r.next()) {
+				vuelosI.add(i, r.getString(1));
+				// System.out.println(atributos);
+			}
+
+			r.close();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		} 
+		return vuelosI;
+	}
+
+	
+
+	
+}

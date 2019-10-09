@@ -1,0 +1,178 @@
+package Administrador;
+
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Insets;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
+
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JList;
+import javax.swing.JOptionPane;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.JTable;
+
+import ConfiguradorDeFondo.Sizer;
+import Inicio.ConsultorBdD;
+
+public class PantallaAdministrador {
+	private JFrame frame;
+	private Container panel;
+	private JTextArea textArea;
+	private JLabel ingreseSentencias, labelTablasVuelos, labelResultado;
+	private JButton limpiarTextArea, aceptarSentencia;
+	private JList<String> listaTablas;
+	private JTable tabla;
+	private JScrollPane scrollPaneTabla;
+	private ConsultorBdD consultor;
+	private Sizer sizer;
+	
+	public PantallaAdministrador(JFrame f, Container p, ConsultorBdD c) {
+		frame = f; panel = p; consultor = c;
+		sizer = new Sizer();
+		sizer.configurarFrame(frame, "./Fondo de Administrador.jpg");
+		panel = frame.getContentPane();
+		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
+		panel.setLayout(null);
+		
+		setearElementosPantalla();
+	}
+	
+	private void setearElementosPantalla() {
+		ingreseSentencias = new JLabel("Escriba aquí las sentencias SQL que desee ejecutar:");
+		sizer.boundsSetter(ingreseSentencias, 0.05, 0.03, 1, 0.035);
+		sizer.fontSizer(ingreseSentencias, true, 0.0013);
+		panel.add(ingreseSentencias);
+		
+		setearTextArea();
+		
+		limpiarTextArea = new JButton("Limpiar Texto");
+		setearBoton(limpiarTextArea, 0.1, 0.25, 0.0035);
+		limpiarTextArea.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) { textArea.setText(""); }
+		});
+		
+		aceptarSentencia = new JButton("Aceptar la Sentencia");
+		setearBoton(aceptarSentencia, 0.5, 0.4, 0.0025);
+		aceptarSentencia.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent arg0) { aceptada(); }
+		});
+		
+		labelTablasVuelos = new JLabel("Tablas en la Base Vuelos:");
+		sizer.boundsSetter(labelTablasVuelos, 0.6, 0.275, 0.35, 0.035);
+		sizer.fontSizer(labelTablasVuelos, true, 0.0035);
+		panel.add(labelTablasVuelos);
+		
+		setearLista(false);
+		
+		labelResultado = new JLabel("Resultado de la Última Ejecución:");
+		sizer.boundsSetter(labelResultado, 0.05, 0.275, 0.5, 0.035);
+		sizer.fontSizer(labelResultado, true, 0.0025);
+		panel.add(labelResultado);
+		
+		setearTabla(null, false);
+	}
+	
+	private void setearTextArea() {
+		textArea = new JTextArea();
+		JScrollPane scrollPaneArea = new JScrollPane(textArea);
+		sizer.boundsSetter(textArea, 0.05, 0.075, 0.9, 0.1);
+		sizer.fontSizer(textArea, false, 0.0005);
+		textArea.setMargin(new Insets(5,5,5,5));
+		scrollPaneArea.setBounds(textArea.getBounds());
+		panel.add(scrollPaneArea);
+	}
+	
+	private void setearLista(boolean borrar) {
+		if (borrar)
+			panel.remove(listaTablas);
+		listaTablas = new JList<String>(consultor.obtenerTablas());
+		JScrollPane scrollPaneLista = new JScrollPane(listaTablas);
+		sizer.boundsSetter(listaTablas, 0.6, 0.325, 0.35, 0.575);
+		sizer.fontSizer(listaTablas, false, 0.00025);
+		scrollPaneLista.setBounds(listaTablas.getBounds());
+		crearMouseListener();
+		panel.add(scrollPaneLista);
+	}
+	
+	
+	private void setearTabla(DefaultTableModel modelo, boolean estaba) {
+		if (estaba)
+			panel.remove(scrollPaneTabla);
+		tabla = new JTable(modelo) {
+			private static final long serialVersionUID = 1L;
+			public Component prepareRenderer(TableCellRenderer renderer, int row, int column) {
+				Component returnComp = super.prepareRenderer(renderer, row, column);
+				//Color colorPares = new Color(150,255,150);
+				//Color colorImpares = new Color(210,255,210);
+				Color colorPares = new Color(239,200,100);
+				Color colorImpares = new Color(255,228,186);
+				if (!returnComp.getBackground().equals(getSelectionBackground())) {
+					Color bg = (row % 2 == 0 ? colorPares : colorImpares);
+					returnComp.setBackground(bg);
+					//bg = null;
+				}
+				return returnComp;
+			}
+		};
+		scrollPaneTabla = new JScrollPane(tabla);
+		sizer.boundsSetter(tabla, 0.05, 0.325, 0.5, 0.575);
+		sizer.fontSizer(tabla, false, 0.0001);
+		scrollPaneTabla.setBounds(tabla.getBounds());
+		
+		if (modelo != null) {
+			tabla.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+			for (int i = 0; i < tabla.getColumnCount(); i++)
+				tabla.getColumnModel().getColumn(i).setMinWidth((int) (tabla.getWidth() * 0.35));
+		}
+		
+		panel.add(scrollPaneTabla);
+	}
+	
+	private void setearBoton(JButton boton, double x, double ancho, double letra) {
+		boton.setEnabled(true);
+		sizer.boundsSetter(boton, x, 0.2, ancho, 0.055);
+		sizer.fontSizer(boton, false, letra);
+		panel.add(boton);
+	}
+	
+	private void aceptada() {
+		String[][] resultadoConsulta = consultor.comprobarSentencia(textArea.getText());
+		if (!resultadoConsulta[0][0].equals("Hola0")) {
+			String[] arreglo = new String[resultadoConsulta[0].length];
+			for (int i = 0; i < resultadoConsulta[0].length; i++)
+				arreglo[i] = "Dato " + (i + 1);
+			DefaultTableModel modelo = new DefaultTableModel(resultadoConsulta, arreglo);
+			setearTabla(modelo, true);
+			setearLista(true);
+		}
+		else
+			textArea.setText(textArea.getText() + "\n\nError en la sentencia:\n" + resultadoConsulta[0][0]); //El error obtenido mediante el consultor.
+			//No sé cómo se hacen las consultas ni qué devuelven. Si devuelven un String, entonces puedo usar directamente ese String
+			//(decidiendo con algún criterio si es un error o no.)
+			//CREO QUE VOY A RESOLVER ESTO CON UN try-catch DE SQLException.
+	}
+	
+	private void crearMouseListener() {
+		MouseListener mouseListener = new MouseAdapter() {
+			public void mouseClicked(MouseEvent e) {
+				if (e.getClickCount() >= 2) {
+					String selectedItem = listaTablas.getSelectedValue();
+					JList<String> lista = new JList<String>(consultor.obtenerAtributos(selectedItem));
+					JScrollPane scrollPaneOptionPane = new JScrollPane(lista);
+					JOptionPane.showMessageDialog(null, scrollPaneOptionPane, "Atributos de la Tabla " + selectedItem, JOptionPane.PLAIN_MESSAGE);
+				}
+			}
+		};
+		listaTablas.addMouseListener(mouseListener);
+	}
+}

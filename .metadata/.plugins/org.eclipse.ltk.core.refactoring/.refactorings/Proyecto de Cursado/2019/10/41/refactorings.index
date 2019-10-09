@@ -1,0 +1,10 @@
+1570542402306	Rename local variable 'alternateColor'
+1570542423236	Rename local variable 'whiteColor'
+1570543719183	Rename method 'getListCellRendererComponent'
+1570544766960	Delete element
+1570545920440	Delete element
+1570561142112	Rename method 'mostrarTablas'
+1570561173853	Rename method 'obtenerTablas'
+1570568163344	Rename method 'ingresarSentencia'
+1570577026683	Rename local variable 'selectedItem'
+1570577232274	Rename local variable 'scrollPaneOptionPane'

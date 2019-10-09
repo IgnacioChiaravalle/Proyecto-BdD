@@ -1,0 +1,96 @@
+package Inicio;
+
+import java.sql.SQLException;
+
+public class ConsultorBdD {
+	Conexion conexion;
+	
+	public ConsultorBdD(String servidor) { }
+
+	@SuppressWarnings("static-access")
+	public boolean chequearAdministrador(String password) {
+		java.sql.Connection cnx = null;
+		
+		try {
+			cnx = conexion.iniciarConnection("admin", password);
+		}
+		catch (SQLException e) {
+			imprimirError(e);
+		}
+		catch (Exception e) {
+            System.out.println("Error Desconocido:");
+            e.printStackTrace();
+        }
+		
+		return cnx != null;
+	}
+	/*public boolean login(String usuario, String contrasena) {
+    boolean resultado = false;
+
+    sSQL = "SELECT u.nombre FROM usuario U WHERE u.usuario='"
+            + usuario + "' AND u.contrasena='" + contrasena + "'";
+
+    // Java 7 try-with-resources
+    try (Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(sSQL)) {
+
+        resultado = rs.next();
+
+    } catch (SQLException e) {
+        JOptionPane.showMessageDialog(null, "SQLException:\n" + e, "Error: Logica_usuario.tableRegistros(String buscar)", JOptionPane.ERROR_MESSAGE);
+        }
+
+    return resultado;
+}*/
+	public boolean chequearEmpleado(String legajo, String password) {
+		try {
+			return java.sql.DriverManager.getConnection("hola", "empleado", password) != null;
+		} catch (SQLException e) { imprimirError(e); }
+		return false;
+	}
+	
+	private void imprimirError(SQLException e) {
+		System.out.println("Error de Conexión:");
+		System.out.println("SQL Exception: " + e.getMessage());
+		System.out.println("SQL State: " + e.getSQLState());
+		System.out.println("SQL Error Code: " + e.getErrorCode());
+	}
+	
+	public String[][] comprobarSentencia(String sentencia) {
+		String[][] matriz = new String[30][20];
+ 		if (!sentencia.toLowerCase().equals("hola")) {
+			for (int i = 0; i < matriz.length; i++) {
+				for (int j = 0; j < matriz[i].length; j++)
+					matriz[i][j] = "Fila " + i + "; Columna " + j;
+			}
+			return matriz;
+		}
+		//Esto lo voy a resolver con un throws SQLException. Al hacer catch en PantallaAdministrador, imprimo el error.
+		//Las siguientes sentencias son provisorias.
+		String[] provisorio0 = {"Hola0"}, provisorio1 = {"Hola1"}, provisorio2 = {"Hola2"};
+ 		matriz[0] = provisorio0;
+ 		matriz[1] = provisorio1;
+ 		matriz[2] = provisorio2;
+		return matriz;
+	}
+	
+	public String[] obtenerTablas() {
+		String[] arreglo = {"Hola", "Me", "Llamo", "Nacho"};
+		return arreglo;
+	}
+	
+	public String[] obtenerAtributos(String nombreTabla) {
+		String[] arreglo = {"Zorro 1", "Zorro 8", "Zorro 12", "Zorro 1"};
+		return arreglo;
+	}
+	
+	public String[] obtenerCiudades() {
+		String[] arreglo = {"Bahía Blanca", "Ciudad 13", "Área 51", "Tatooine"};
+		return arreglo;
+	}
+	
+	public String[] obtenerFechas(String partida, String destino) {
+		String[] arreglo = {"1/1/1", "32/13/-1", "36/85/4655"};
+		return arreglo;
+	}
+}
