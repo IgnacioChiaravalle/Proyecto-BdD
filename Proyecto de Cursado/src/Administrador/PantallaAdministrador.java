@@ -28,8 +28,9 @@ public class PantallaAdministrador {
 	private JLabel ingreseSentencias, labelTablasVuelos, labelResultado;
 	private JButton limpiarTextArea, aceptarSentencia;
 	private JList<String> listaTablas;
+	private MouseListener mouseListener;
 	private DBTable tabla;
-	private JScrollPane scrollPaneTabla;
+	private JScrollPane scrollPaneTabla, scrollPaneLista;
 	private ConsultorBdD consultor;
 	private Sizer sizer;
 	
@@ -69,6 +70,7 @@ public class PantallaAdministrador {
 		sizer.fontSizer(labelTablasVuelos, true, 0.0035);
 		panel.add(labelTablasVuelos);
 		
+		crearMouseListener();
 		setearLista();
 		
 		labelResultado = new JLabel("Resultado de la Última Ejecución:");
@@ -90,14 +92,14 @@ public class PantallaAdministrador {
 	}
 	
 	private void setearLista() {
-		if (listaTablas != null)
-			panel.remove(listaTablas);
+		if (scrollPaneLista != null)
+			panel.remove(scrollPaneLista);
 		listaTablas = new JList<String>(consultor.obtenerTablas());
-		JScrollPane scrollPaneLista = new JScrollPane(listaTablas);
+		listaTablas.addMouseListener(mouseListener);
+		scrollPaneLista = new JScrollPane(listaTablas);
 		sizer.boundsSetter(listaTablas, 0.6, 0.325, 0.35, 0.575);
 		sizer.fontSizer(listaTablas, false, 0.00025);
 		scrollPaneLista.setBounds(listaTablas.getBounds());
-		crearMouseListener();
 		panel.add(scrollPaneLista);
 	}
 	
@@ -141,7 +143,7 @@ public class PantallaAdministrador {
 	}
 	
 	private void crearMouseListener() {
-		MouseListener mouseListener = new MouseAdapter() {
+		mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() >= 2) {
 					String selectedItem = listaTablas.getSelectedValue();
@@ -151,6 +153,5 @@ public class PantallaAdministrador {
 				}
 			}
 		};
-		listaTablas.addMouseListener(mouseListener);
 	}
 }

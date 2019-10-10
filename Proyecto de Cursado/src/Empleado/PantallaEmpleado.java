@@ -1,7 +1,6 @@
 package Empleado;
 
 import java.awt.Container;
-import java.awt.datatransfer.Clipboard;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
@@ -9,6 +8,7 @@ import java.awt.event.ItemListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.sql.Date;
 
 import javax.swing.JButton;
 import javax.swing.JComboBox;
@@ -18,8 +18,6 @@ import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollPane;
 
-import com.mysql.cj.xdevapi.Table;
-
 import ConfiguradorDeFondo.Sizer;
 import Inicio.ConsultorBdD;
 import quick.dbtable.DBTable;
@@ -28,7 +26,8 @@ public class PantallaEmpleado {
 	private JFrame frame;
 	private Container panel;
 	private JLabel seleccionePartida, seleccioneDestino, seleccioneVuelosBuscados, seleccioneFechaIda, seleccioneFechaVuelta, seleccioneOpcionIda, seleccioneOpcionVuelta;
-	private JComboBox<String> partida, destino, idaVueltaOIda, fechaIda, fechaVuelta;
+	private JComboBox<String> partida, destino, idaVueltaOIda;
+	private JComboBox<Date> fechaIda, fechaVuelta;
 	private JButton btnAceptar;
 	private DBTable opcionesIda = null, opcionesVuelta = null;
 	private JScrollPane scrollPaneIda, scrollPaneVuelta;
@@ -55,6 +54,9 @@ public class PantallaEmpleado {
 		partida = new JComboBox<String>(consultor.obtenerCiudades());
 		sizer.boundsSetter(partida, 0.025, 0.075, 0.45, 0.0425);
 		sizer.fontSizer(partida, false, 0.0021);
+		partida.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent event) { setearSelectoresDeFechas(); }
+		});
 		panel.add(partida);
 		
 		seleccioneDestino = new JLabel("Seleccione la Ciudad de Destino:");
@@ -65,6 +67,9 @@ public class PantallaEmpleado {
 		destino = new JComboBox<String>(consultor.obtenerCiudades());
 		sizer.boundsSetter(destino, 0.525, 0.075, 0.45, 0.0425);
 		sizer.fontSizer(destino, false, 0.0021);
+		destino.addItemListener(new ItemListener() {
+			public void itemStateChanged(ItemEvent event) { setearSelectoresDeFechas(); }
+		});
 		panel.add(destino);
 		
 		seleccioneVuelosBuscados = new JLabel("Seleccione el Estilo de Viaje a Buscar:");
@@ -77,15 +82,17 @@ public class PantallaEmpleado {
 		sizer.boundsSetter(idaVueltaOIda, 0.75, 0.15, 0.2, 0.046);
 		sizer.fontSizer(idaVueltaOIda, false, 0.005);
 		idaVueltaOIda.addItemListener(new ItemListener() {
-			public void itemStateChanged(ItemEvent event){
+			public void itemStateChanged(ItemEvent event) {
 				String item = (String) event.getItem();
 				if (item.equals("Sólo Ida")) {
-					fechaVuelta.setEnabled(false);
+					if (fechaVuelta != null)
+						fechaVuelta.setEnabled(false);
 					if (opcionesVuelta != null)
 						opcionesVuelta.setEnabled(false);
 				}
 				else {
-					fechaVuelta.setEnabled(true);
+					if (fechaVuelta != null)
+						fechaVuelta.setEnabled(true);
 					if (opcionesVuelta != null)
 						opcionesVuelta.setEnabled(true);
 				}
@@ -98,20 +105,10 @@ public class PantallaEmpleado {
 		sizer.fontSizer(seleccioneFechaIda, true, 0.00275);
 		panel.add(seleccioneFechaIda);
 		
-		fechaIda = new JComboBox<String>(consultor.obtenerFechas((String) partida.getSelectedItem(), (String) destino.getSelectedItem()));
-		sizer.boundsSetter(fechaIda, 0.05, 0.27, 0.4, 0.04);
-		sizer.fontSizer(fechaIda, false, 0.0027);
-		panel.add(fechaIda);
-		
 		seleccioneFechaVuelta = new JLabel("Seleccione la Fecha de Retorno:");
 		sizer.boundsSetter(seleccioneFechaVuelta, 0.55, 0.22, 0.45, 0.035);
 		sizer.fontSizer(seleccioneFechaVuelta, true, 0.00275);
 		panel.add(seleccioneFechaVuelta);
-		
-		fechaVuelta = new JComboBox<String>(consultor.obtenerFechas((String) destino.getSelectedItem(), (String) partida.getSelectedItem()));
-		sizer.boundsSetter(fechaVuelta, 0.55, 0.27, 0.4, 0.04);
-		sizer.fontSizer(fechaVuelta, false, 0.0027);
-		panel.add(fechaVuelta);
 		
 		btnAceptar = new JButton("ACEPTAR");
 		btnAceptar.setEnabled(true);
@@ -119,7 +116,7 @@ public class PantallaEmpleado {
 		sizer.fontSizer(btnAceptar, true, 0.0035);
 		panel.add(btnAceptar);
 		btnAceptar.addActionListener(new ActionListener() {
-			public void actionPerformed(ActionEvent arg0) { setearTablasYSusLabels(); }
+			public void actionPerformed(ActionEvent arg0) { setearTablas(); }
 		});
 		
 		seleccioneOpcionIda = new JLabel("Seleccione un Vuelo para la Partida:");
@@ -133,35 +130,48 @@ public class PantallaEmpleado {
 		panel.add(seleccioneOpcionVuelta);
 	}
 	
-	private void setearTablasYSusLabels() {
-		opcionesIda = consultor.obtenerVuelos(obtenerCiudad(partida), obtenerCiudad(destino));
-		if (opcionesIda != null) {
-			if (scrollPaneIda != null)
+	private void setearTablas() {
+		if (chequearValidez()) {
+			if (scrollPaneIda != null) {
 				panel.remove(scrollPaneIda);
-			scrollPaneIda = new JScrollPane(opcionesIda);
-			sizer.boundsSetter(opcionesIda, 0.05, 0.425, 0.9, 0.225);
-			sizer.fontSizer(opcionesIda, false, 0.00025);
-			scrollPaneIda.setBounds(opcionesIda.getBounds());
-			for (int i = 0; i < opcionesIda.getColumnCount(); i++)
-				opcionesIda.getColumn(i).setMinWidth((int) (opcionesIda.getWidth() * 0.35));
-			opcionesIda.setEditable(false);
-			panel.add(scrollPaneIda);
-			setearListenerTabla(opcionesIda);
-		}
-		
-		opcionesVuelta = consultor.obtenerVuelos(obtenerCiudad(destino), obtenerCiudad(partida));
-		if (opcionesVuelta != null) {
-			if (scrollPaneVuelta != null)
+				scrollPaneIda.setVisible(false);
+			}
+			if (fechaIda != null && fechaIda.getItemCount() > 0) {
+				opcionesIda = consultor.obtenerVuelos(obtenerCiudad(partida), obtenerCiudad(destino), (Date) fechaIda.getSelectedItem());
+				if (opcionesIda != null) {
+					scrollPaneIda = new JScrollPane(opcionesIda);
+					sizer.boundsSetter(opcionesIda, 0.05, 0.425, 0.9, 0.225);
+					sizer.fontSizer(opcionesIda, false, 0.00025);
+					scrollPaneIda.setBounds(opcionesIda.getBounds());
+					scrollPaneIda.setVisible(true);
+					for (int i = 0; i < opcionesIda.getColumnCount(); i++)
+						opcionesIda.getColumn(i).setMinWidth((int) (opcionesIda.getWidth() * 0.35));
+					opcionesIda.setEditable(false);
+					panel.add(scrollPaneIda);
+					setearListenerTabla(opcionesIda);
+				}
+			}
+			
+			if (scrollPaneVuelta != null) {
 				panel.remove(scrollPaneVuelta);
-			scrollPaneVuelta = new JScrollPane(opcionesVuelta);
-			sizer.boundsSetter(opcionesVuelta, 0.05, 0.69, 0.9, 0.225);
-			sizer.fontSizer(opcionesVuelta, false, 0.00025);
-			scrollPaneVuelta.setBounds(opcionesVuelta.getBounds());
-			for (int i = 0; i < opcionesVuelta.getColumnCount(); i++)
-				opcionesVuelta.getColumn(i).setMinWidth((int) (opcionesVuelta.getWidth() * 0.35));
-			opcionesVuelta.setEditable(false);
-			panel.add(scrollPaneVuelta);
-			setearListenerTabla(opcionesVuelta);
+				scrollPaneVuelta.setVisible(false);
+			}
+			String vuelosBuscados = (String) idaVueltaOIda.getSelectedItem();
+			if (fechaVuelta != null && fechaVuelta.getItemCount() > 0 && vuelosBuscados.equals("Ida y Vuelta")) {
+				opcionesVuelta = consultor.obtenerVuelos(obtenerCiudad(destino), obtenerCiudad(partida), (Date) fechaVuelta.getSelectedItem());
+				if (opcionesVuelta != null) {
+					scrollPaneVuelta = new JScrollPane(opcionesVuelta);
+					sizer.boundsSetter(opcionesVuelta, 0.05, 0.69, 0.9, 0.225);
+					sizer.fontSizer(opcionesVuelta, false, 0.00025);
+					scrollPaneVuelta.setBounds(opcionesVuelta.getBounds());
+					scrollPaneVuelta.setVisible(true);
+					for (int i = 0; i < opcionesVuelta.getColumnCount(); i++)
+						opcionesVuelta.getColumn(i).setMinWidth((int) (opcionesVuelta.getWidth() * 0.35));
+					opcionesVuelta.setEditable(false);
+					panel.add(scrollPaneVuelta);
+					setearListenerTabla(opcionesVuelta);
+				}
+			}
 		}
 	}
 	
@@ -177,17 +187,52 @@ public class PantallaEmpleado {
 		return ciudad;
 	}
 	
+	private void setearSelectoresDeFechas() {
+		if (scrollPaneIda != null)
+			scrollPaneIda.setVisible(false);
+		if (scrollPaneVuelta != null)
+			scrollPaneVuelta.setVisible(false);
+		
+		if (fechaIda != null)
+			panel.remove(fechaIda);
+		fechaIda = new JComboBox<Date>(consultor.obtenerFechas(obtenerCiudad(partida), obtenerCiudad(destino)));
+		sizer.boundsSetter(fechaIda, 0.05, 0.27, 0.4, 0.04);
+		sizer.fontSizer(fechaIda, false, 0.0027);
+		panel.add(fechaIda);
+		
+		if (fechaVuelta != null)
+			panel.remove(fechaVuelta);
+		fechaVuelta = new JComboBox<Date>(consultor.obtenerFechas(obtenerCiudad(destino), obtenerCiudad(partida)));
+		sizer.boundsSetter(fechaVuelta, 0.55, 0.27, 0.4, 0.04);
+		sizer.fontSizer(fechaVuelta, false, 0.0027);
+		String vuelosBuscados = (String) idaVueltaOIda.getSelectedItem();
+		if (vuelosBuscados.equals("Sólo Ida"))
+			fechaVuelta.setEnabled(false);
+		panel.add(fechaVuelta);
+	}
+	
 	private void setearListenerTabla(DBTable tabla) {
 		MouseListener mouseListener = new MouseAdapter() {
 			public void mouseClicked(MouseEvent e) {
 				if (e.getClickCount() >= 2 && tabla.getSelectedRowCount() == 1) {
-					tabla.copyToClipboard(tabla.getSelectedRows());
-					JList<String> lista = new JList<String>(consultor.obtenerDatosVuelo(new Clipboard().)); //Ehh... ¿El clipboard podrá contener un String de la fila, del que yo pueda obtener el número de vuelo?
+					String nroVuelo = (String) tabla.getValueAt(tabla.getSelectedRow(), 0);
+					JList<String> lista = new JList<String>(consultor.obtenerClasesVuelo(nroVuelo));
 					JScrollPane scrollPaneOptionPane = new JScrollPane(lista);
-					JOptionPane.showMessageDialog(null, scrollPaneOptionPane, "Clases del Vuelo " + , JOptionPane.PLAIN_MESSAGE);
+					JOptionPane.showMessageDialog(null, scrollPaneOptionPane, "Clases Disponibles en el Vuelo " + nroVuelo, JOptionPane.PLAIN_MESSAGE);
 				}
 			}
 		};
 		tabla.addMouseListener(mouseListener);
+	}
+	
+	private boolean chequearValidez() {
+		Date ida = (Date) fechaIda.getSelectedItem();
+		Date vuelta = (Date) fechaVuelta.getSelectedItem();
+		String vuelosBuscados = (String) idaVueltaOIda.getSelectedItem();
+		if (vuelosBuscados.equals("Sólo Ida") || ida == null || vuelta == null)
+			return true;
+		if (vuelta.compareTo(ida) < 0)
+			JOptionPane.showMessageDialog(null, "La fecha de retorno debe ser posterior a la de partida.", "Fecha de Retorno Inválida", JOptionPane.ERROR_MESSAGE);
+		return vuelta.compareTo(ida) >= 0;
 	}
 }

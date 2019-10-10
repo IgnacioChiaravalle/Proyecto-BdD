@@ -1,5 +1,6 @@
 package Inicio;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.LinkedList;
 
@@ -46,7 +47,7 @@ public class ConsultorBdD {
 	public DBTable comprobarSentencia(String sentencia) throws SQLException {
 		DBTable tabla = null;
 		try {
-			tabla = Conexion.ejecutarSELECT(sentencia);
+			tabla = Conexion.ejecutarSentenciaSQL(sentencia);
 		} catch (ClassNotFoundException e) {
 			System.out.println("Error Desconocido:");
             e.printStackTrace();
@@ -90,19 +91,39 @@ public class ConsultorBdD {
 		return arreglo;
 	}
 	
-	public String[] obtenerFechas(String partida, String destino) {
-		String[] arreglo = {"1/1/1", "32/13/-1", "36/85/4655"};
+	@SuppressWarnings("static-access")
+	public Date[] obtenerFechas(String partida, String destino) {
+		Date[] arreglo = {};
+		try {
+			LinkedList<Date> listaFechas = conexion.getFechas(partida, destino);
+			arreglo = setearArregloFechas(listaFechas);
+		} catch (SQLException e) {
+			imprimirError(e);
+		}
 		return arreglo;
 	}
 	
-	public DBTable obtenerVuelos(String cSalida, String cLlegada) {
+	@SuppressWarnings("static-access")
+	public DBTable obtenerVuelos(String cSalida, String cLlegada, Date fechaVuelo) {
 		DBTable tabla = null;
 		try {
-			tabla = Conexion.getVuelos(cSalida, cLlegada);
+			tabla = conexion.getVuelos(cSalida, cLlegada, fechaVuelo);
 		} catch (SQLException e) {
 			imprimirError(e);
 		}
 		return tabla;
+	}
+	
+	@SuppressWarnings("static-access")
+	public String[] obtenerClasesVuelo(String nroVuelo) {
+		String[] arreglo = {};
+		try {
+			LinkedList<String> listaClases = conexion.getClasesVuelo(nroVuelo);
+			arreglo = setearArreglo(listaClases);
+		} catch (SQLException e) {
+			imprimirError(e);
+		}
+		return arreglo;
 	}
 	
 	
@@ -110,6 +131,15 @@ public class ConsultorBdD {
 		String[] arreglo = new String[lista.size()];
 		int i = 0;
 		for (String s : lista) {
+			arreglo[i] = s;
+			i++;
+		}
+		return arreglo;
+	}
+	private Date[] setearArregloFechas(LinkedList<Date> lista) {
+		Date[] arreglo = new Date[lista.size()];
+		int i = 0;
+		for (Date s : lista) {
 			arreglo[i] = s;
 			i++;
 		}
