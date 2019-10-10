@@ -37,7 +37,7 @@ public class PantallaAdministrador {
 	public PantallaAdministrador(JFrame f, Container p, ConsultorBdD c) {
 		frame = f; panel = p; consultor = c;
 		sizer = new Sizer();
-		sizer.configurarFrame(frame, "/Imágenes/Fondo de Administrador.jpg");
+		sizer.configurarFrame(frame, "./Fondo de Administrador.jpg");
 		panel = frame.getContentPane();
 		panel.setBounds(0, 0, frame.getWidth(), frame.getHeight());
 		panel.setLayout(null);

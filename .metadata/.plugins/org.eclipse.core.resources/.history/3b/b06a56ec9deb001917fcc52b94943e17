@@ -135,8 +135,6 @@ public class PantallaEmpleado {
 			if (scrollPaneIda != null) {
 				panel.remove(scrollPaneIda);
 				scrollPaneIda.setVisible(false);
-				panel.repaint();
-				panel.revalidate();
 			}
 			if (fechaIda != null && fechaIda.getItemCount() > 0) {
 				opcionesIda = consultor.obtenerVuelos(obtenerCiudad(partida), obtenerCiudad(destino), (Date) fechaIda.getSelectedItem());

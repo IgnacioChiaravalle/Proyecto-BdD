@@ -6,14 +6,15 @@ import java.util.LinkedList;
 
 import quick.dbtable.DBTable;
 
-@SuppressWarnings("static-access")
 public class ConsultorBdD {
 	Conexion conexion;
 	
 	public ConsultorBdD() { }
 
+	@SuppressWarnings("static-access")
 	public boolean chequearAdministrador(String password) {
 		java.sql.Connection cnx = null;
+		
 		try {
 			cnx = conexion.iniciarConnection("admin", password);
 		}
@@ -24,9 +25,11 @@ public class ConsultorBdD {
             System.out.println("Error Desconocido:");
             e.printStackTrace();
         }
+		
 		return cnx != null;
 	}
 	
+	@SuppressWarnings("static-access")
 	public boolean chequearEmpleado(String legajo, String password) {
 		boolean exito = false;
 		try {
@@ -44,7 +47,7 @@ public class ConsultorBdD {
 	public DBTable comprobarSentencia(String sentencia) throws SQLException {
 		DBTable tabla = null;
 		try {
-			tabla = conexion.ejecutarSentenciaSQL(sentencia);
+			tabla = Conexion.ejecutarSentenciaSQL(sentencia);
 		} catch (ClassNotFoundException e) {
 			System.out.println("Error Desconocido:");
             e.printStackTrace();
@@ -52,6 +55,7 @@ public class ConsultorBdD {
 		return tabla;
 	}
 	
+	@SuppressWarnings("static-access")
 	public String[] obtenerTablas() {
 		String[] arreglo = {};
 		try {
@@ -63,6 +67,7 @@ public class ConsultorBdD {
 		return arreglo;
 	}
 	
+	@SuppressWarnings("static-access")
 	public String[] obtenerAtributos(String nombreTabla) {
 		String[] arreglo = {};
 		try {
@@ -74,6 +79,7 @@ public class ConsultorBdD {
 		return arreglo;
 	}
 	
+	@SuppressWarnings("static-access")
 	public String[] obtenerCiudades() {
 		String[] arreglo = {};
 		try {
@@ -85,6 +91,7 @@ public class ConsultorBdD {
 		return arreglo;
 	}
 	
+	@SuppressWarnings("static-access")
 	public Date[] obtenerFechas(String partida, String destino) {
 		Date[] arreglo = {};
 		try {
@@ -96,6 +103,7 @@ public class ConsultorBdD {
 		return arreglo;
 	}
 	
+	@SuppressWarnings("static-access")
 	public DBTable obtenerVuelos(String cSalida, String cLlegada, Date fechaVuelo) {
 		DBTable tabla = null;
 		try {
@@ -106,6 +114,7 @@ public class ConsultorBdD {
 		return tabla;
 	}
 	
+	@SuppressWarnings("static-access")
 	public String[] obtenerClasesVuelo(String nroVuelo) {
 		String[] arreglo = {};
 		try {

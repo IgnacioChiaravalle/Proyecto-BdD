@@ -135,8 +135,6 @@ public class PantallaEmpleado {
 			if (scrollPaneIda != null) {
 				panel.remove(scrollPaneIda);
 				scrollPaneIda.setVisible(false);
-				panel.repaint();
-				panel.revalidate();
 			}
 			if (fechaIda != null && fechaIda.getItemCount() > 0) {
 				opcionesIda = consultor.obtenerVuelos(obtenerCiudad(partida), obtenerCiudad(destino), (Date) fechaIda.getSelectedItem());
@@ -157,8 +155,6 @@ public class PantallaEmpleado {
 			if (scrollPaneVuelta != null) {
 				panel.remove(scrollPaneVuelta);
 				scrollPaneVuelta.setVisible(false);
-				panel.repaint();
-				panel.revalidate();
 			}
 			String vuelosBuscados = (String) idaVueltaOIda.getSelectedItem();
 			if (fechaVuelta != null && fechaVuelta.getItemCount() > 0 && vuelosBuscados.equals("Ida y Vuelta")) {
